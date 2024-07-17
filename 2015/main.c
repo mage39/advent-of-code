@@ -7,15 +7,18 @@ int main () {
 		return -1;
 	}
 
-	int i = fgetc(input);
+	int c = fgetc(input);
 	int output = 0;
+	int i = 1;
 
-	while (i != EOF) {
-		if (i == '(') output++;
-		if (i == ')') output--;
-		i = fgetc(input);
+	while (c != EOF) {
+		if (c == '(') output++;
+		if (c == ')') output--;
+		if (output < 0) break;
+		c = fgetc(input);
+		i++;
 	}
 
-	printf("%d\n", output);
+	printf("%d\n", i);
 	return 0;
 }
