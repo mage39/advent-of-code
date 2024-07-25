@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int main () {
 	FILE* input = fopen("input", "r");
@@ -7,18 +8,9 @@ int main () {
 		return -1;
 	}
 
-	int c = fgetc(input);
-	int output = 0;
-	int i = 1;
+	char line[10] = {0};
+	
+	while (fgets()
 
-	while (c != EOF) {
-		if (c == '(') output++;
-		if (c == ')') output--;
-		if (output < 0) break;
-		c = fgetc(input);
-		i++;
-	}
-
-	printf("%d\n", i);
 	return 0;
 }
