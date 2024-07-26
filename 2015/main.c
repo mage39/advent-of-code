@@ -9,7 +9,7 @@ int main () {
 	}
 
 	char line[10] = {0};
-	int total = 0, lc = 0;
+	int total = 0;
 	
 	while (fgets(line, 10, input)) {
 		if (!line[1]) break;
@@ -22,21 +22,20 @@ int main () {
 
 		if (length > width) {
 			if (length > height) {
-				slack = width * height;
+				slack = 2 * width + 2 * height;
 			} else {
-				slack = width * length;
+				slack = 2 * width + 2 * length;
 			}
 		} else {
 			if (width > height) {
-				slack = length * height;
+				slack = 2 * length + 2 * height;
 			} else {
-				slack = length * width;
+				slack = 2 * length + 2 * width;
 			}
 		}
-		total += 2 * length * width + 2 * width * height + 2 * height * length + slack;
-		lc++;
+		total += slack + length * width * height;
 	}
-	printf("%d, lc = %d\n", total, lc);
+	printf("%d\n", total);
 
 	return 0;
 }
