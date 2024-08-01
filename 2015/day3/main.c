@@ -17,48 +17,45 @@ uint64_t hashf (house data) {
 	return hash;
 }
 
-void rehashExpand (house* addrs, int* arrLen) { // aborts. no idea why
-	size_t size = sizeof(house) * *arrLen;
-	house* temp = malloc(size);
-	memcpy(temp, addrs, size);
+house* rehashExpand (house* addrs, int* arrLen) {
 	*arrLen *= 2;
-	size *= 2;
-	printf("%d\n", size);
-	house* err = realloc(addrs, size);
-	if (!err) {
+	size_t size = sizeof(house) * *arrLen;
+	house* new = malloc(size);
+	if (!new) {
 		printf("WTF\n");
 		exit(1);
-	} else addrs = err;
-	memset(addrs, 0, size);
-	for (int i = 0; i < *arrLen; i++) {
-		if (!temp[i].count) continue;
-		int j = hashf(temp[i]) % *arrLen;
+	}
+	memset(new, 0, size);
+	for (int i = 0; i < *arrLen / 2; i++) {
+		if (!addrs[i].count) continue;
+		int j = hashf(addrs[i]) % *arrLen;
 		for (int k = 0; k < *arrLen / 4; k++) {
 			int offset = j + k;
 			if (offset >= *arrLen) offset -= *arrLen;
-			if (!addrs[offset].count) {
-				memcpy(addrs + offset, temp + i, sizeof(house));
+			if (!new[offset].count) {
+				memcpy(new + offset, addrs + i, sizeof(house));
 				break;
 			}
 		}
 	}
-	free(temp);
+	free(addrs);
+	return new;
 }
 
-int placeHash (house* addrs, house currentPos, int arrLen) {
-	int i = hashf(currentPos) % arrLen;
+int placeHash (house* addrs, house* currentPos, int arrLen) {
+	int i = hashf(*currentPos) % arrLen;
 	for (int j = 0; j < arrLen / 4; j++) {
 		int offset = i + j;
 		if (offset >= arrLen) offset -= arrLen;
 		if (addrs[offset].count) {
-			if (addrs[offset].addr[0] == currentPos.addr[0] && addrs[offset].addr[1] == currentPos.addr[1]) {
+			if (!memcmp(addrs[offset].addr, currentPos->addr, sizeof(int) * 2)) {
 				addrs[offset].count++;
 				return 0;
 			}
 		} else {
-			memcpy(addrs + offset, &currentPos, sizeof(house));
+			memcpy(addrs + offset, currentPos, sizeof(house));
 			addrs[offset].count = 1;
-			currentPos.count++;
+			currentPos->count++;
 			return 0;
 		}
 	}
@@ -86,10 +83,11 @@ int main () {
 		if (letter == '>') currentPos.addr[1]++;
 		if (letter == 'v') currentPos.addr[0]--;
 		if (letter == '<') currentPos.addr[1]--;
-		int err = placeHash(addrs, currentPos, arrLen);
-		if (err) rehashExpand(addrs, &arrLen);
+		int err = placeHash(addrs, &currentPos, arrLen);
+		if (err) addrs = rehashExpand(addrs, &arrLen);
 		letter = getc(input);
 	}
+	free(addrs);
 
 	printf("%d\n", currentPos.count);
 	return 0;

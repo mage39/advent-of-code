@@ -1,1 +1,1 @@
-gcc day3/main.c -o prog
+gcc day3/main.c -g -o prog
