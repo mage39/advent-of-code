@@ -42,20 +42,19 @@ house* rehashExpand (house* addrs, int* arrLen) {
 	return new;
 }
 
-int placeHash (house* addrs, house* currentPos, int arrLen) {
-	int i = hashf(*currentPos) % arrLen;
+int placeHash (house* addrs, house santa, int arrLen) {
+	int i = hashf(santa) % arrLen;
 	for (int j = 0; j < arrLen / 4; j++) {
 		int offset = i + j;
 		if (offset >= arrLen) offset -= arrLen;
 		if (addrs[offset].count) {
-			if (!memcmp(addrs[offset].addr, currentPos->addr, sizeof(int) * 2)) {
+			if (!memcmp(addrs[offset].addr, santa.addr, sizeof(int) * 2)) {
 				addrs[offset].count++;
 				return 0;
 			}
 		} else {
-			memcpy(addrs + offset, currentPos, sizeof(house));
+			memcpy(addrs + offset, &santa, sizeof(house));
 			addrs[offset].count = 1;
-			currentPos->count++;
 			return 0;
 		}
 	}
@@ -69,32 +68,48 @@ int main () {
 		exit(-1);
 	}
 	int arrLen = 32;
-	int letter = getc(input);
+	int letter = 0;
+	house santa = {0}, roboSanta = {0};
 	house* addrs = malloc(sizeof(house) * arrLen);
 	if (!addrs) {
 		printf("WTF\n");
 		exit(1);
 	}
 	memset(addrs, 0, sizeof(house) * arrLen);
-	house currentPos = {0};
-	placeHash(addrs, &currentPos, arrLen);
 	while (letter != EOF) {
-		if (letter == '^') currentPos.addr[0]++;
-		if (letter == '>') currentPos.addr[1]++;
-		if (letter == 'v') currentPos.addr[0]--;
-		if (letter == '<') currentPos.addr[1]--;
-		int err = placeHash(addrs, &currentPos, arrLen);
+		letter = getc(input);
+		if (letter == EOF) break;
+		if (letter == '^') santa.addr[0]++;
+		if (letter == '>') santa.addr[1]++;
+		if (letter == 'v') santa.addr[0]--;
+		if (letter == '<') santa.addr[1]--;
+		int err = placeHash(addrs, santa, arrLen);
 		if (err) {
 			addrs = rehashExpand(addrs, &arrLen);
-			err = placeHash(addrs, &currentPos, arrLen);
+			err = placeHash(addrs, santa, arrLen);
 			if (err) {
 				printf("WTF\n");
 				exit(2);
 			}
 		}
 		letter = getc(input);
+		if (letter == '^') roboSanta.addr[0]++;
+		if (letter == '>') roboSanta.addr[1]++;
+		if (letter == 'v') roboSanta.addr[0]--;
+		if (letter == '<') roboSanta.addr[1]--;
+		err = placeHash(addrs, roboSanta, arrLen);
+		if (err) {
+			addrs = rehashExpand(addrs, &arrLen);
+			err = placeHash(addrs, roboSanta, arrLen);
+			if (err) {
+				printf("WTF\n");
+				exit(2);
+			}
+		}
 	}
+	int count = 0;
+	for (int i = 0; i < arrLen; i++) if (addrs[i].count) count++;
 	free(addrs);
-	printf("%d\n", currentPos.count);
+	printf("%d\n", count[0]);
 	return 0;
 }
