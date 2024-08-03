@@ -68,7 +68,6 @@ int main () {
 		printf("WTF\n");
 		exit(-1);
 	}
-
 	int arrLen = 32;
 	int letter = getc(input);
 	house* addrs = malloc(sizeof(house) * arrLen);
@@ -77,18 +76,25 @@ int main () {
 		exit(1);
 	}
 	memset(addrs, 0, sizeof(house) * arrLen);
-	house currentPos = {.count = 1};
+	house currentPos = {0};
+	placeHash(addrs, &currentPos, arrLen);
 	while (letter != EOF) {
 		if (letter == '^') currentPos.addr[0]++;
 		if (letter == '>') currentPos.addr[1]++;
 		if (letter == 'v') currentPos.addr[0]--;
 		if (letter == '<') currentPos.addr[1]--;
 		int err = placeHash(addrs, &currentPos, arrLen);
-		if (err) addrs = rehashExpand(addrs, &arrLen);
+		if (err) {
+			addrs = rehashExpand(addrs, &arrLen);
+			err = placeHash(addrs, &currentPos, arrLen);
+			if (err) {
+				printf("WTF\n");
+				exit(2);
+			}
+		}
 		letter = getc(input);
 	}
 	free(addrs);
-
 	printf("%d\n", currentPos.count);
 	return 0;
 }
