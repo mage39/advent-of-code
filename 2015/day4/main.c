@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -14,8 +15,9 @@ typedef struct {
 
 static uint32_t leftrotate (uint32_t a, uint32_t b) {
 	for (int i = 0; i < a; i++) {
+		uint32_t t = b >> 31;
 		b <<= 1;
-		b |= b >> 31;
+		b |= t;
 	}
 }
 
@@ -46,8 +48,11 @@ static hash_t MD5 (char messgdata[], size_t length) {
 	char* message = malloc(length);
 	strncpy(message, messgdata, length);
 	size_t newLen = length + 9; // required minumum padding
-	if (int t = length % 64) {
-		newLen += 64 - t;
+	{
+		int t;
+		if (t = length % 64) {
+			newLen += 64 - t;
+		}
 	} 
 	realloc(message, newLen);
 	message[length] = 0x80;
@@ -88,7 +93,7 @@ static hash_t MD5 (char messgdata[], size_t length) {
 	}
 	free(message);
 	hash_t ret;
-	memcpy(ret, hash, sizeof(hash));
+	memcpy(ret.data, hash, sizeof(hash));
 	return ret;
 }
 
