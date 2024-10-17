@@ -14,11 +14,7 @@ typedef struct {
 } hash_t;
 
 static uint32_t leftrotate (uint32_t a, uint32_t b) {
-	for (int i = 0; i < a; i++) {
-		uint32_t t = b >> 31;
-		b <<= 1;
-		b |= t;
-	}
+	return (a << b) | (a >> 32 - b);
 }
 
 static hash_t MD5 (char messgdata[], size_t length) {
