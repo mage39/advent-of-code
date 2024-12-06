@@ -13,10 +13,6 @@ typedef struct {
 	char data[16];
 } hash_t;
 
-static uint32_t leftrotate (uint32_t a, uint32_t b) {
-	return (a << b) | (a >> 32 - b);
-}
-
 static hash_t MD5 (char messgdata[], size_t length) {
 #define LEN 64
 	int s[LEN], K[LEN];
@@ -56,8 +52,7 @@ static hash_t MD5 (char messgdata[], size_t length) {
 		int idx = length + 1;
 		memcpy(message + idx, 0, newLen - idx);
 	}
-	uint64_t bitLen = length * 8;
-	*(uint64_t*)(message + newLen - sizeof(uint64_t)) = bitLen;
+	*(uint64_t*)(message + newLen - sizeof(uint64_t)) = length * 8; // allat for a negative one index. python would be proud
 	// now for the real stuff
 	for (int i = 0; i < newLen; i += LEN) {
 		int M[16];
@@ -67,23 +62,23 @@ static hash_t MD5 (char messgdata[], size_t length) {
 		for (int j = 0; j < LEN; j++) {
 			int F, g;
 			if (j < 16) {
-				F = F(temp[0], temp[1], temp[2], temp[3]);
+				F = F(temp[1], temp[2], temp[3]);
 				g = i;
 			} else if (j < 32) {
-				F = G(temp[0], temp[1], temp[2], temp[3]);
+				F = G(temp[1], temp[2], temp[3]);
 				g = (5 * i + 1) % 16;
 			} else if (j < 48) {
-				F = H(temp[0], temp[1], temp[2], temp[3]);
+				F = H(temp[1], temp[2], temp[3]);
 				g = (5 * i + 5) % 16;
 			} else {
-				F = I(temp[0], temp[1], temp[2], temp[3]);
+				F = I(temp[1], temp[2], temp[3]);
 				g = (7 * i) % 16;
 			}
 			F += temp[0] + K[i] + M[g];
 			temp[0] = temp[3];
 			temp[3] = temp[2];
 			temp[2] = temp[1];
-			temp[1] += leftrotate(F, s[i]);
+			temp[1] += (F << s[i]) | (F >> 32 - s[i]);
 		}
 		for (int j = 0; j < 4; j++) hash[j] += temp[j];
 	}
@@ -91,6 +86,7 @@ static hash_t MD5 (char messgdata[], size_t length) {
 	hash_t ret;
 	memcpy(ret.data, hash, sizeof(hash));
 	return ret;
+#undef LEN
 }
 
 int main () {
