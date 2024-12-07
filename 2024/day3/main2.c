@@ -14,28 +14,26 @@ int main (void) {
 	if (tok) *tok = 0;
 	tok = strstr(tok + 1, "do()");
 	long ret = 0;
-	while (mul < input + LEN) {
-		while (mul) {
-			mul += 4;
-			// if (*mul == ' ') goto cont;
-			char* endptr;
-			long a = strtol(mul, &endptr, 10);
-			if (*endptr != ',' || endptr == mul) goto cont;
-			mul = endptr + 1;
-			long b = strtol(mul, &endptr, 10);
-			if (*endptr != ')' || endptr == mul) goto cont;
-			ret += a * b;
+	while (mul) {
+		mul += 4;
+		// if (*mul == ' ') goto cont;
+		char* endptr;
+		long a = strtol(mul, &endptr, 10);
+		if (*endptr != ',' || endptr == mul) goto cont;
+		mul = endptr + 1;
+		long b = strtol(mul, &endptr, 10);
+		if (*endptr != ')' || endptr == mul) goto cont;
+		ret += a * b;
 cont:
-			mul = strstr(mul, "mul(");
-		}
-		mul = tok;
-		tok = strstr(input, "don't()");
+		mul = strstr(mul, "mul(");
+		if (mul) continue;
+		if (!tok) break;
+		mul = strstr(tok, "mul(");
+		tok = strstr(tok, "don't()");
 		if (tok) {
 			*tok = 0;
 			tok = strstr(tok + 1, "do()");
 		}
-		if (!tok) break; // but what if i didnt find the disable?
-		mul = strstr(mul, "mul(");
 	}
 	printf("%ld\n", ret);
 	return 0;
