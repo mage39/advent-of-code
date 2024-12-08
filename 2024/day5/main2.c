@@ -8,20 +8,24 @@ typedef struct {
 	int after;
 } Order;
 
-Order input[LEN] = {0};
-
-int cmp (const void* a, const void* b) {
-	int _a = *(int*)a, _b = *(int*)b;
+int cmp (int a, int b, Order input[LEN]) {
 	for (int i = 0; i < LEN && input[i].before; i++) {
-		if (_a == input[i].before && _b == input[i].after) return 1;
-		else if (_a == input[i].after && _b == input[i].before) return -1;
+		if (a == input[i].before && b == input[i].after) return 1;
+		else if (a == input[i].after && b == input[i].before) return -1;
 	}
 	return 0;
+}
+
+void sort (int pages[30], int pageCount, Order input[LEN]) {
+	Order pairs[435] = 0; // ncr 30 items, paired = 435
+	for (int i = 0; i < 435; i++) {
+	}
 }
 
 int main (void) {
 	FILE* infile = fopen("input.txt", "r");
 	if (!infile) return 1;
+	Order input[LEN] = {0};
 	char line[80];
 	for (int i = 0; i < LEN; i++) {
 		fgets(line, sizeof(line), infile);
@@ -55,8 +59,7 @@ int main (void) {
 		for (int i = 0; i < 30 && tok; i++) pages[i] = atoi(strsep(&tok, ","));
 		int pageCount = 0;
 		for (int i = 0; i < 30 && pages[i]; i++) pageCount++;
-		qsort(pages, pageCount, sizeof(int), &cmp);	// clearly THAT didn't work
-													// time to roll my own
+		sort(pages, pageCount, input);
 		ret += pages[pageCount / 2];
 	}
 	fclose(outfile);
