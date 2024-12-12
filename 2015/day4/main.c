@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <error.h>
 #include <math.h>
 
 #define F(b, c, d) (b & c | ~b & d)
@@ -46,7 +47,12 @@ static hash_t MD5 (char messgdata[], size_t length) {
 			newLen += 64 - t;
 		}
 	} 
-	realloc(message, newLen);
+	message = realloc(message, newLen);
+	if (!message) {
+		fprintf(stderr, "%s:%s:%s: ", __BASE_FILE__, __func__, __LINE__);
+		perror();
+		exit(1);
+	}
 	message[length] = 0x80;
 	{
 		int idx = length + 1;
